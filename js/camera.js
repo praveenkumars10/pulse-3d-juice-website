@@ -200,12 +200,12 @@ export class CameraManager {
     }
 
     // Smooth damp mouse parallax
-    this.mouse.x = THREE.MathUtils.lerp(this.mouse.x, this.mouse.targetX, 0.05);
-    this.mouse.y = THREE.MathUtils.lerp(this.mouse.y, this.mouse.targetY, 0.05);
+    this.mouse.x = THREE.MathUtils.lerp(this.mouse.x, this.mouse.targetX, 0.08);
+    this.mouse.y = THREE.MathUtils.lerp(this.mouse.y, this.mouse.targetY, 0.08);
 
-    // Parallax offset applied without disturbing GSAP ScrollTrigger timeline coordinates
-    this.camera.position.x += (this.mouse.x * this.parallaxStrength - this.camera.position.x * 0.02);
-    this.camera.position.y += (-this.mouse.y * this.parallaxStrength * 0.7 - this.camera.position.y * 0.02);
+    // Apply butter-smooth rotational parallax that NEVER mutates position or fights GSAP
+    this.camera.rotation.y = -this.mouse.x * 0.035;
+    this.camera.rotation.x = -this.mouse.y * 0.022;
   }
 
   handleResize(width, height) {

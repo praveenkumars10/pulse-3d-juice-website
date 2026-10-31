@@ -66,12 +66,12 @@ class App {
   // =========================================================================
   initLenis() {
     this.lenis = new Lenis({
-      duration: 1.25,
+      duration: 0.85,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
       smoothTouch: false,
-      wheelMultiplier: 1.0,
-      touchMultiplier: 1.5
+      wheelMultiplier: 1.15,
+      touchMultiplier: 1.2
     });
 
     // Synchronize Lenis with GSAP ScrollTrigger

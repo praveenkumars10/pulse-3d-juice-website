@@ -34,7 +34,7 @@ export class AnimationController {
         trigger: scrollContainer,
         start: 'top top',
         end: 'bottom bottom',
-        scrub: 1.0,
+        scrub: 0.35, // Snappy, ultra-responsive scroll tracking (no molasses delay)
         onUpdate: (self) => {
           this.handleScrollProgress(self.progress);
         }

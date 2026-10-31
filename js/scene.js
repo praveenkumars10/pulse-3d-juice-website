@@ -229,15 +229,17 @@ export class SceneManager {
     this.strawberryFruit.scale.set(0.001, 0.001, 0.001);
     this.fruitGroup.add(this.strawberryFruit);
 
-    // 6. Suspended Juice Pearls & Floating Droplets (30 instanced or scattered pearls)
+    // 6. Suspended Juice Pearls & Floating Droplets (28 pearls)
     this.pearlsGroup = new THREE.Group();
     const pearlGeo = new THREE.SphereGeometry(0.045, 12, 12);
-    const pearlMat = new THREE.MeshPhysicalMaterial({
+    const pearlMat = new THREE.MeshStandardMaterial({
       color: this.currentProduct.juiceColor,
-      transmission: 0.9,
-      roughness: 0.05,
-      ior: 1.34,
-      transparent: true
+      emissive: new THREE.Color(this.currentProduct.juiceColor).multiplyScalar(0.35),
+      roughness: 0.1,
+      metalness: 0.05,
+      transparent: true,
+      opacity: 0.85,
+      envMapIntensity: 2.2
     });
 
     for (let k = 0; k < 28; k++) {
@@ -287,8 +289,9 @@ export class SceneManager {
 
     PRODUCTS.forEach((prod, i) => {
       const bottle = this.assets.createBottle(prod, {
-        segments: 36,
-        dropletsCount: Math.floor(this.perf.dropletsCount * 0.6)
+        segments: 32,
+        isGallery: true,
+        dropletsCount: 20
       });
 
       // Position in an elegant curved 3D panoramic arc
@@ -565,11 +568,16 @@ export class SceneManager {
     this.raycaster = new THREE.Raycaster();
     this.mouse = new THREE.Vector2(-999, -999);
     this.hoveredBottle = null;
+    this.mouseMoved = false;
+    this.raycastFrameCount = 0;
+    this.lastHovered = null;
+    this.isCapHovered = false;
 
     window.addEventListener('mousemove', (e) => {
       this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
       this.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-    });
+      this.mouseMoved = true;
+    }, { passive: true });
   }
 
   checkRaycast(camera) {
@@ -655,24 +663,28 @@ export class SceneManager {
       this.splash.rotation.y += 0.008;
     }
 
-    // 5. Gallery Hover check
-    const hovered = this.checkRaycast(camera);
+    // 5. Throttled Hover Raycast (Only recalculates when mouse actually moves, every 3 frames)
+    this.raycastFrameCount++;
+    if (this.mouseMoved && (this.raycastFrameCount % 3 === 0)) {
+      this.mouseMoved = false;
+      this.lastHovered = this.checkRaycast(camera);
+      this.isCapHovered = this.checkHeroCapRaycast(camera);
+    }
+
+    const hovered = this.lastHovered;
     this.galleryBottles.forEach(bottle => {
       if (bottle === hovered) {
         bottle.position.y = THREE.MathUtils.lerp(bottle.position.y, 0.35, 0.1);
         bottle.scale.lerp(new THREE.Vector3(1.1, 1.1, 1.1), 0.1);
-        document.body.style.cursor = 'pointer';
       } else {
         bottle.position.y = THREE.MathUtils.lerp(bottle.position.y, 0, 0.1);
         bottle.scale.lerp(new THREE.Vector3(1.0, 1.0, 1.0), 0.1);
       }
     });
 
-    // Cap hover check
-    const isCapHovered = this.checkHeroCapRaycast(camera);
-    if (isCapHovered) {
+    if (this.isCapHovered || hovered) {
       document.body.style.cursor = 'pointer';
-    } else if (!hovered && document.body.style.cursor === 'pointer') {
+    } else {
       document.body.style.cursor = 'default';
     }
 

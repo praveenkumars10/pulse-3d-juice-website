@@ -81,7 +81,7 @@ body {
 .scroll-container {
   position: relative;
   width: 100%;
-  height: 800vh; /* 8 rich cinematic sequences */
+  height: 680vh; /* Tuned for snappy, energetic scene transitions */
   z-index: 5;
   pointer-events: none;
 }
@@ -255,6 +255,7 @@ body {
   position: absolute;
   max-width: 580px;
   pointer-events: none;
+  will-change: transform, opacity;
 }
 
 .text-label {
