@@ -191,19 +191,211 @@ class App {
       });
     });
 
-    // Order action in drawer
-    const orderBtn = document.getElementById('drawer-order-action');
-    if (orderBtn) {
-      orderBtn.addEventListener('click', () => {
-        orderBtn.innerHTML = '✓ ADDED TO TASTING CRATE';
-        orderBtn.style.background = '#4CAF50';
-        this.audio.playSplash();
-        setTimeout(() => {
-          orderBtn.innerHTML = 'PROCEED TO REFRESHMENT';
-          orderBtn.style.background = '';
-        }, 2200);
+    // 5. Build Your Own 6-Pack Crate System
+    this.crate = [0, 0, 1, 2, 3, 4]; // Pre-filled default discovery pack
+    this.setupCrateBuilder();
+
+    // 6. 360° Free Orbit & Zoom Inspect Mode
+    this.setupInspectMode();
+
+    // 7. Studio Lighting Mode Switcher (Noir, Sunset, Daylight)
+    this.setupLightingSwitcher();
+
+    // 8. "Find Your Flavour" Mood Quiz Modal
+    this.setupMoodQuiz();
+
+    // 9. Interactive Bottle Uncap & Fruit Click Listeners
+    this.setupInteractiveCanvasClicks();
+  }
+
+  // =========================================================================
+  // 360° FREE ORBIT & ZOOM INSPECT MODE
+  // =========================================================================
+  setupInspectMode() {
+    const inspectBtn = document.getElementById('inspect-toggle-btn');
+    const exitBtn = document.getElementById('exit-inspect-btn');
+    const banner = document.getElementById('inspect-banner');
+
+    const toggleInspect = (enable) => {
+      if (enable) {
+        this.cameraCtrl.enableInspectMode();
+        document.body.classList.add('inspect-mode-active');
+        if (banner) banner.classList.add('visible');
+        if (inspectBtn) inspectBtn.classList.add('active');
+        this.lenis.stop(); // Pause scroll while inspecting 360
+        this.audio.playChime(770);
+      } else {
+        this.cameraCtrl.disableInspectMode();
+        document.body.classList.remove('inspect-mode-active');
+        if (banner) banner.classList.remove('visible');
+        if (inspectBtn) inspectBtn.classList.remove('active');
+        this.lenis.start(); // Resume scroll
+        this.audio.playCapClick();
+      }
+    };
+
+    if (inspectBtn) {
+      inspectBtn.addEventListener('click', () => {
+        toggleInspect(!this.cameraCtrl.isInspectMode);
       });
     }
+
+    if (exitBtn) {
+      exitBtn.addEventListener('click', () => {
+        toggleInspect(false);
+      });
+    }
+  }
+
+  // =========================================================================
+  // STUDIO LIGHTING THEME SWITCHER
+  // =========================================================================
+  setupLightingSwitcher() {
+    const lightBtn = document.getElementById('nav-light-btn');
+    const modes = ['noir', 'sunset', 'daylight'];
+    let currentIdx = 0;
+
+    if (lightBtn) {
+      lightBtn.addEventListener('click', () => {
+        currentIdx = (currentIdx + 1) % modes.length;
+        const mode = modes[currentIdx];
+        this.sceneMgr.setLightingMode(mode);
+
+        const label = lightBtn.querySelector('.light-label');
+        if (label) {
+          label.textContent = mode.toUpperCase();
+        }
+        this.audio.playTick();
+      });
+    }
+  }
+
+  // =========================================================================
+  // 6-PACK TASTING CRATE BUILDER
+  // =========================================================================
+  setupCrateBuilder() {
+    const addBtn = document.getElementById('drawer-add-crate-btn');
+    const resetBtn = document.getElementById('crate-reset-btn');
+
+    if (addBtn) {
+      addBtn.addEventListener('click', () => {
+        if (this.crate.length < 6) {
+          this.crate.push(this.sceneMgr.activeProductIndex);
+          this.updateCrateUI();
+          this.audio.playSplash();
+        } else {
+          addBtn.textContent = 'CRATE FULL (6/6)';
+          setTimeout(() => addBtn.textContent = '+ ADD TO CRATE', 1500);
+        }
+      });
+    }
+
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        this.crate = [];
+        this.updateCrateUI();
+        this.audio.playTick();
+      });
+    }
+
+    const orderActionBtn = document.getElementById('drawer-order-action');
+    if (orderActionBtn) {
+      orderActionBtn.addEventListener('click', () => {
+        orderActionBtn.innerHTML = '✓ CRATE ORDERED • REFRESHING SOON';
+        orderActionBtn.style.background = '#4CAF50';
+        this.audio.playSplash();
+        setTimeout(() => {
+          orderActionBtn.innerHTML = 'PROCEED TO CHECKOUT • $38.00';
+          orderActionBtn.style.background = '';
+        }, 2500);
+      });
+    }
+
+    this.updateCrateUI();
+  }
+
+  updateCrateUI() {
+    const slots = document.querySelectorAll('.crate-slot');
+    const countEl = document.getElementById('crate-count');
+    if (countEl) countEl.textContent = `${this.crate.length} / 6`;
+
+    slots.forEach((slot, i) => {
+      slot.className = 'crate-slot';
+      slot.innerHTML = '';
+      if (i < this.crate.length) {
+        const prodIndex = this.crate[i];
+        const prod = PRODUCTS[prodIndex];
+        slot.classList.add('filled');
+        slot.style.borderColor = prod.accentColor;
+        slot.innerHTML = `<span class="slot-dot" style="background:${prod.accentColor}"></span><span class="slot-label">${prod.name.split(' ')[0]}</span>`;
+      } else {
+        slot.style.borderColor = 'rgba(255,255,255,0.12)';
+        slot.innerHTML = `<span class="slot-empty">+</span>`;
+      }
+    });
+  }
+
+  // =========================================================================
+  // "FIND YOUR FLAVOUR" MOOD QUIZ MODAL
+  // =========================================================================
+  setupMoodQuiz() {
+    const quizModal = document.getElementById('quiz-modal');
+    const quizBtnNav = document.getElementById('nav-quiz-btn');
+    const quizClose = document.getElementById('quiz-close-btn');
+
+    if (quizBtnNav) {
+      quizBtnNav.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (quizModal) quizModal.classList.add('open');
+        this.audio.playChime(660);
+      });
+    }
+
+    if (quizClose) {
+      quizClose.addEventListener('click', () => {
+        if (quizModal) quizModal.classList.remove('open');
+      });
+    }
+
+    // Quiz Options Click
+    const quizOptions = document.querySelectorAll('.quiz-option-card');
+    quizOptions.forEach(card => {
+      card.addEventListener('click', () => {
+        const targetIndex = parseInt(card.dataset.flavorIndex || '0', 10);
+        if (quizModal) quizModal.classList.remove('open');
+        
+        // Scroll to Scene 5 (Flavour Transformation) and set recommended flavor!
+        this.lenis.scrollTo(document.body.scrollHeight * 0.72, { duration: 1.8 });
+        setTimeout(() => {
+          this.animCtrl.jumpToFlavour(targetIndex);
+          this.audio.playPop();
+        }, 1200);
+      });
+    });
+  }
+
+  // =========================================================================
+  // INTERACTIVE BOTTLE UNCAP & FRUIT BURST CLICKS
+  // =========================================================================
+  setupInteractiveCanvasClicks() {
+    window.addEventListener('click', (e) => {
+      if (e.target.closest('button') || e.target.closest('nav') || e.target.closest('.drawer') || e.target.closest('.quiz-modal')) return;
+
+      // Check if Cap is clicked
+      const isCap = this.sceneMgr.checkHeroCapRaycast(this.cameraCtrl.camera);
+      if (isCap) {
+        this.sceneMgr.toggleCap(this.audio);
+        return;
+      }
+
+      // Check if Floating Fruit is clicked
+      const fruit = this.sceneMgr.checkFruitRaycast(this.cameraCtrl.camera);
+      if (fruit) {
+        fruit.userData.rotSpeed.x += 0.35;
+        fruit.userData.rotSpeed.y += 0.45;
+        this.audio.playSplash();
+      }
+    });
   }
 
   // Populate drawer content with selected flavor details

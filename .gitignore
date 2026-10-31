@@ -6,6 +6,7 @@ dist/
 
 # Scratch & test scripts
 test-browser.js
+screenshot-*.png
 *.log
 npm-debug.log*
 

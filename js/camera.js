@@ -26,8 +26,102 @@ export class CameraManager {
     this.parallaxStrength = 0.22;
     this.isMobile = window.innerWidth < 768;
 
+    // 360° Free Orbit & Zoom Inspection Mode State
+    this.isInspectMode = false;
+    this.inspectSpherical = {
+      radius: 5.2,
+      targetRadius: 5.2,
+      theta: 0,
+      targetTheta: 0,
+      phi: Math.PI / 2,
+      targetPhi: Math.PI / 2
+    };
+    this.isDragging = false;
+    this.prevDrag = { x: 0, y: 0 };
+    this.savedCameraPos = new THREE.Vector3();
+
     this.setupListeners();
+    this.setupInspectDragListeners();
     this.updateResponsiveFraming();
+  }
+
+  setupInspectDragListeners() {
+    window.addEventListener('mousedown', (e) => {
+      if (!this.isInspectMode) return;
+      if (e.target.closest('button') || e.target.closest('nav') || e.target.closest('.drawer')) return;
+      this.isDragging = true;
+      this.prevDrag.x = e.clientX;
+      this.prevDrag.y = e.clientY;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!this.isInspectMode || !this.isDragging) return;
+      const dx = e.clientX - this.prevDrag.x;
+      const dy = e.clientY - this.prevDrag.y;
+      this.prevDrag.x = e.clientX;
+      this.prevDrag.y = e.clientY;
+
+      this.inspectSpherical.targetTheta -= dx * 0.008;
+      this.inspectSpherical.targetPhi = THREE.MathUtils.clamp(
+        this.inspectSpherical.targetPhi + dy * 0.008,
+        0.3,
+        Math.PI - 0.3
+      );
+    });
+
+    window.addEventListener('mouseup', () => {
+      this.isDragging = false;
+    });
+
+    window.addEventListener('wheel', (e) => {
+      if (!this.isInspectMode) return;
+      this.inspectSpherical.targetRadius = THREE.MathUtils.clamp(
+        this.inspectSpherical.targetRadius + e.deltaY * 0.003,
+        2.2,
+        7.5
+      );
+    }, { passive: true });
+
+    // Touch support for 360 inspect mode
+    window.addEventListener('touchstart', (e) => {
+      if (!this.isInspectMode || e.touches.length === 0) return;
+      this.isDragging = true;
+      this.prevDrag.x = e.touches[0].clientX;
+      this.prevDrag.y = e.touches[0].clientY;
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+      if (!this.isInspectMode || !this.isDragging || e.touches.length === 0) return;
+      const dx = e.touches[0].clientX - this.prevDrag.x;
+      const dy = e.touches[0].clientY - this.prevDrag.y;
+      this.prevDrag.x = e.touches[0].clientX;
+      this.prevDrag.y = e.touches[0].clientY;
+
+      this.inspectSpherical.targetTheta -= dx * 0.01;
+      this.inspectSpherical.targetPhi = THREE.MathUtils.clamp(
+        this.inspectSpherical.targetPhi + dy * 0.01,
+        0.3,
+        Math.PI - 0.3
+      );
+    }, { passive: true });
+
+    window.addEventListener('touchend', () => {
+      this.isDragging = false;
+    });
+  }
+
+  enableInspectMode() {
+    this.isInspectMode = true;
+    this.savedCameraPos.copy(this.camera.position);
+    this.inspectSpherical.targetRadius = 5.0;
+    this.inspectSpherical.targetTheta = 0;
+    this.inspectSpherical.targetPhi = Math.PI / 2;
+  }
+
+  disableInspectMode() {
+    this.isInspectMode = false;
+    this.camera.position.copy(this.savedCameraPos);
+    this.camera.lookAt(this.lookTarget);
   }
 
   setupListeners() {
@@ -72,6 +166,39 @@ export class CameraManager {
   }
 
   update() {
+    if (this.isInspectMode) {
+      // 360 Free Orbit & Zoom Spherical Math
+      this.inspectSpherical.radius = THREE.MathUtils.lerp(
+        this.inspectSpherical.radius,
+        this.inspectSpherical.targetRadius,
+        0.08
+      );
+      this.inspectSpherical.theta = THREE.MathUtils.lerp(
+        this.inspectSpherical.theta,
+        this.inspectSpherical.targetTheta,
+        0.08
+      );
+      this.inspectSpherical.phi = THREE.MathUtils.lerp(
+        this.inspectSpherical.phi,
+        this.inspectSpherical.targetPhi,
+        0.08
+      );
+
+      const r = this.inspectSpherical.radius;
+      const sinPhi = Math.sin(this.inspectSpherical.phi);
+      const cosPhi = Math.cos(this.inspectSpherical.phi);
+      const sinTheta = Math.sin(this.inspectSpherical.theta);
+      const cosTheta = Math.cos(this.inspectSpherical.theta);
+
+      this.camera.position.set(
+        r * sinPhi * sinTheta,
+        r * cosPhi,
+        r * sinPhi * cosTheta
+      );
+      this.camera.lookAt(0, 0, 0);
+      return;
+    }
+
     // Smooth damp mouse parallax
     this.mouse.x = THREE.MathUtils.lerp(this.mouse.x, this.mouse.targetX, 0.05);
     this.mouse.y = THREE.MathUtils.lerp(this.mouse.y, this.mouse.targetY, 0.05);

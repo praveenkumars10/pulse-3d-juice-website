@@ -8,7 +8,7 @@
 
   <!-- Favicon & Stylesheet -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23FF5722'/><text x='50' y='65' font-size='42' font-weight='900' text-anchor='middle' fill='white'>P</text></svg>">
-  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 
@@ -41,9 +41,16 @@
       <li><a href="#flavours" id="nav-flavours">Flavours</a></li>
       <li><a href="#ingredients" id="nav-ingredients">Our Ingredients</a></li>
       <li><a href="#story" id="nav-story">Our Story</a></li>
+      <li><a href="#quiz" id="nav-quiz-btn" style="color: var(--color-blood-orange);">✦ Find Your Harvest</a></li>
     </ul>
 
     <div class="nav-actions">
+      <!-- Lighting Mode Switcher (Noir / Sunset / Daylight) -->
+      <button class="light-btn" id="nav-light-btn" aria-label="Toggle Lighting Mode">
+        <span class="light-icon">◐</span>
+        <span class="light-label">NOIR</span>
+      </button>
+
       <!-- Web Audio Synthesizer Sound Button -->
       <button class="sound-btn" id="sound-toggle-btn" aria-label="Toggle Sound">
         <span class="sound-icon-bars">
@@ -52,6 +59,12 @@
           <span class="bar"></span>
         </span>
         <span class="sound-label">SOUND OFF</span>
+      </button>
+
+      <!-- 360° Inspect Mode Toggle Button -->
+      <button class="inspect-btn" id="inspect-toggle-btn" aria-label="Toggle 360 Inspect">
+        <span class="inspect-icon">◎</span>
+        <span class="inspect-label">360° VIEW</span>
       </button>
 
       <button class="btn-primary" id="nav-explore-btn">EXPLORE</button>
@@ -147,6 +160,19 @@
     <div class="scroll-indicator-hero">
       <div class="scroll-indicator-mouse"></div>
       <span>SCROLL TO EXPERIENCE</span>
+      <span class="interactive-sub-hint">✦ CLICK CAP TO POP • CLICK FRUIT TO SPIN • 360° VIEW AVAILABLE</span>
+    </div>
+
+    <!-- 360° Orbit Inspect Floating Banner -->
+    <div id="inspect-banner" class="inspect-banner">
+      <div class="inspect-banner-inner">
+        <span class="inspect-pulse-dot"></span>
+        <div class="inspect-info">
+          <span class="inspect-mode-title">360° STUDIO INSPECT ACTIVE</span>
+          <span class="inspect-mode-desc">Drag to orbit • Wheel / pinch to zoom • Tap bottle cap to unseal</span>
+        </div>
+        <button id="exit-inspect-btn" class="exit-inspect-btn">EXIT 360°</button>
+      </div>
     </div>
   </div>
 
@@ -240,6 +266,31 @@
         </div>
       </div>
 
+      <!-- 6-PACK TASTING CRATE BUILDER -->
+      <div class="crate-builder-section">
+        <div class="crate-builder-header">
+          <div>
+            <span class="crate-kicker">CURATED SELECTION</span>
+            <h4 class="crate-title">BUILD YOUR 6-PACK CRATE</h4>
+          </div>
+          <span class="crate-counter" id="crate-count">6 / 6</span>
+        </div>
+
+        <div class="crate-slots-grid">
+          <div class="crate-slot"></div>
+          <div class="crate-slot"></div>
+          <div class="crate-slot"></div>
+          <div class="crate-slot"></div>
+          <div class="crate-slot"></div>
+          <div class="crate-slot"></div>
+        </div>
+
+        <div class="crate-actions">
+          <button class="crate-btn add-btn" id="drawer-add-crate-btn">+ ADD ACTIVE TO CRATE</button>
+          <button class="crate-btn reset-btn" id="crate-reset-btn">CLEAR</button>
+        </div>
+      </div>
+
       <button class="btn-primary drawer-action-btn" id="drawer-order-action">ORDER TASTING CRATE • $38.00</button>
     </div>
   </aside>
@@ -287,7 +338,69 @@
     </div>
   </footer>
 
+  <!-- "FIND YOUR HARVEST" MOOD QUIZ MODAL -->
+  <div class="quiz-modal" id="quiz-modal" aria-hidden="true">
+    <div class="quiz-modal-backdrop"></div>
+    <div class="quiz-modal-box">
+      <div class="quiz-header">
+        <div>
+          <span class="brand-sub">SENSORY MATCHMAKER</span>
+          <h3 class="quiz-title">FIND YOUR HARVEST</h3>
+        </div>
+        <button class="quiz-close-btn" id="quiz-close-btn" aria-label="Close Quiz">&times;</button>
+      </div>
+      <p class="quiz-subtitle">Select the botanical energy profile your body craves right now:</p>
+      
+      <div class="quiz-options-grid">
+        <div class="quiz-option-card" data-flavor-index="0">
+          <span class="quiz-emoji">🍊</span>
+          <div class="quiz-card-body">
+            <h4>Morning Cognitive Ignition</h4>
+            <p>Mount Etna Blood Orange — bitter crimson citrus oil to activate focus.</p>
+            <span class="quiz-badge" style="background: rgba(255,87,34,0.18); color: #FF5722; border: 1px solid rgba(255,87,34,0.4);">BLOOD ORANGE TAROCCO</span>
+          </div>
+        </div>
+
+        <div class="quiz-option-card" data-flavor-index="1">
+          <span class="quiz-emoji">🥭</span>
+          <div class="quiz-card-body">
+            <h4>Midday Solar Indulgence</h4>
+            <p>Alphonso Mango Nectar — rich, velvety sunshine and tropical enzymes.</p>
+            <span class="quiz-badge" style="background: rgba(255,185,0,0.18); color: #FFB900; border: 1px solid rgba(255,185,0,0.4);">ALPHONSO MANGO</span>
+          </div>
+        </div>
+
+        <div class="quiz-option-card" data-flavor-index="2">
+          <span class="quiz-emoji">🫐</span>
+          <div class="quiz-card-body">
+            <h4>Deep Midnight Restoration</h4>
+            <p>Arctic Wild Bilberry — midnight anthocyanin depth for cellular repair.</p>
+            <span class="quiz-badge" style="background: rgba(112,39,201,0.18); color: #9D5BFF; border: 1px solid rgba(112,39,201,0.4);">ARCTIC BILBERRY</span>
+          </div>
+        </div>
+
+        <div class="quiz-option-card" data-flavor-index="3">
+          <span class="quiz-emoji">🥝</span>
+          <div class="quiz-card-body">
+            <h4>Post-Activity Cell Reset</h4>
+            <p>Golden SunGold Kiwi — actinidin and 280% DV Vitamin C immunity surge.</p>
+            <span class="quiz-badge" style="background: rgba(114,201,74,0.18); color: #72C94A; border: 1px solid rgba(114,201,74,0.4);">GOLDEN KIWI</span>
+          </div>
+        </div>
+
+        <div class="quiz-option-card" data-flavor-index="4">
+          <span class="quiz-emoji">🍓</span>
+          <div class="quiz-card-body">
+            <h4>Sensory Radiance & Vitality</h4>
+            <p>Alpine Wild Strawberry — aromatic wild bouquet and raw antioxidants.</p>
+            <span class="quiz-badge" style="background: rgba(232,41,69,0.18); color: #E82945; border: 1px solid rgba(232,41,69,0.4);">ALPINE STRAWBERRY</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Application Module Entrypoint -->
-  <script type="module" src="./js/main.js"></script>
+  <script type="module" src="/js/main.js"></script>
 </body>
 </html>

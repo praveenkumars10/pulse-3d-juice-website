@@ -194,3 +194,62 @@ export const INGREDIENTS_SHOWCASE = [
   }
 ];
 
+export const LIGHTING_MODES = {
+  noir: {
+    id: 'noir',
+    name: 'DARK NOIR',
+    bg: 'radial-gradient(circle at 65% 45%, #2a0c04 0%, #120401 55%, #050201 100%)',
+    ambientColor: 0xfff8f0,
+    ambientIntensity: 0.45,
+    keyIntensity: 2.2,
+    rimCoolIntensity: 2.8,
+    rimWarmIntensity: 3.2,
+    toneMappingExposure: 1.15
+  },
+  sunset: {
+    id: 'sunset',
+    name: 'GOLDEN ORCHARD',
+    bg: 'radial-gradient(circle at 70% 40%, #542203 0%, #2b0c01 50%, #0d0400 100%)',
+    ambientColor: 0xffd180,
+    ambientIntensity: 0.75,
+    keyIntensity: 3.4,
+    rimCoolIntensity: 1.4,
+    rimWarmIntensity: 4.5,
+    toneMappingExposure: 1.28
+  },
+  daylight: {
+    id: 'daylight',
+    name: 'SCANDI DAYLIGHT',
+    bg: 'radial-gradient(circle at 50% 35%, #fff0dc 0%, #ded2c3 60%, #a89a8c 100%)',
+    ambientColor: 0xffffff,
+    ambientIntensity: 1.1,
+    keyIntensity: 2.6,
+    rimCoolIntensity: 1.8,
+    rimWarmIntensity: 1.6,
+    toneMappingExposure: 1.05
+  }
+};
+
+export const MOOD_QUIZ = [
+  {
+    question: "WHAT IS YOUR BODY CRAVING RIGHT NOW?",
+    options: [
+      { text: "Explosive Morning Vitality", tag: "energy", targetIndex: 0 },
+      { text: "Velvety Tropical Indulgence", tag: "sweet", targetIndex: 1 },
+      { text: "Deep Antioxidant Cellular Shield", tag: "focus", targetIndex: 2 },
+      { text: "Electric Zesty Immunity Boost", tag: "zest", targetIndex: 3 }
+    ]
+  },
+  {
+    question: "HOW DO YOU PREFER YOUR TASTE PROFILE?",
+    options: [
+      { text: "Bittersweet Ruby Citrus & Blood Orange", targetIndex: 0 },
+      { text: "Sun-Drenched Honey Nectar & Pulp", targetIndex: 1 },
+      { text: "Tart Forest Bilberry & Tannic Depth", targetIndex: 2 },
+      { text: "Crisp Tangy Granny Smith & Lime Leaf", targetIndex: 3 },
+      { text: "Wild Woodland Strawberry & Raspberry Floral", targetIndex: 4 }
+    ]
+  }
+];
+
+

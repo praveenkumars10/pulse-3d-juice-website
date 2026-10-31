@@ -6,7 +6,8 @@
 
 import * as THREE from 'three';
 import { AssetEngine } from './assets.js';
-import { PRODUCTS, INGREDIENTS_SHOWCASE } from './products.js';
+import { PRODUCTS, INGREDIENTS_SHOWCASE, LIGHTING_MODES } from './products.js';
+import { gsap } from 'gsap';
 
 export class SceneManager {
   constructor(canvasContainer, performanceManager) {
@@ -16,6 +17,12 @@ export class SceneManager {
     
     this.activeProductIndex = 0;
     this.currentProduct = PRODUCTS[0];
+    this.currentLighting = 'noir';
+    this.isCapOpen = false;
+
+    // Slosh physics state
+    this.slosh = { x: 0, z: 0, targetX: 0, targetZ: 0 };
+    this.prevMouse = { x: 0, y: 0 };
     
     this.initScene();
     this.initLights();
@@ -24,6 +31,7 @@ export class SceneManager {
     this.buildSplash();
     this.buildGallery();
     this.buildIngredientWorld();
+    this.buildMistPuff();
     this.setupFloor();
     this.setupRaycaster();
   }
@@ -398,6 +406,159 @@ export class SceneManager {
   }
 
   // =========================================================================
+  // STUDIO LIGHTING THEME SWITCHER
+  // =========================================================================
+  setLightingMode(modeKey) {
+    const mode = LIGHTING_MODES[modeKey] || LIGHTING_MODES.noir;
+    this.currentLighting = modeKey;
+
+    gsap.to(this.ambientLight, {
+      intensity: mode.ambientIntensity,
+      duration: 1.0
+    });
+    this.ambientLight.color.set(mode.ambientColor);
+
+    gsap.to(this.keyLight, {
+      intensity: mode.keyIntensity,
+      duration: 1.0
+    });
+    gsap.to(this.rimLightCool, {
+      intensity: mode.rimCoolIntensity,
+      duration: 1.0
+    });
+    gsap.to(this.rimLightWarm, {
+      intensity: mode.rimWarmIntensity,
+      duration: 1.0
+    });
+    gsap.to(this.renderer, {
+      toneMappingExposure: mode.toneMappingExposure,
+      duration: 1.0
+    });
+
+    const bgEl = document.getElementById('bg-gradient');
+    if (bgEl) {
+      bgEl.style.background = mode.bg;
+    }
+  }
+
+  // =========================================================================
+  // BOTTLE UNCAP POP & MIST PUFF MECHANICS
+  // =========================================================================
+  buildMistPuff() {
+    this.mistGroup = new THREE.Group();
+    this.mistParticles = [];
+
+    const mistGeo = new THREE.SphereGeometry(0.045, 8, 8);
+    const mistMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0,
+      depthWrite: false
+    });
+
+    for (let i = 0; i < 28; i++) {
+      const p = new THREE.Mesh(mistGeo, mistMat.clone());
+      p.position.set(0, 1.45, 0);
+      p.scale.set(0.1, 0.1, 0.1);
+      p.userData = {
+        vx: (Math.random() - 0.5) * 0.035,
+        vy: 0.04 + Math.random() * 0.05,
+        vz: (Math.random() - 0.5) * 0.035,
+        growth: 0.04 + Math.random() * 0.04,
+        alpha: 0
+      };
+      this.mistGroup.add(p);
+      this.mistParticles.push(p);
+    }
+    this.heroBottle.add(this.mistGroup);
+  }
+
+  triggerMistPuff() {
+    this.mistParticles.forEach(p => {
+      p.position.set(0, 1.48, 0);
+      p.scale.set(0.2, 0.2, 0.2);
+      p.material.opacity = 0.75;
+      p.userData.alpha = 0.75;
+
+      gsap.to(p.position, {
+        x: p.userData.vx * 35,
+        y: 1.48 + p.userData.vy * 25,
+        z: p.userData.vz * 35,
+        duration: 1.1,
+        ease: 'power2.out'
+      });
+      gsap.to(p.scale, {
+        x: 2.2,
+        y: 2.5,
+        z: 2.2,
+        duration: 1.1,
+        ease: 'power1.out'
+      });
+      gsap.to(p.material, {
+        opacity: 0,
+        duration: 1.1,
+        ease: 'power2.in',
+        delay: 0.1
+      });
+    });
+  }
+
+  toggleCap(audio) {
+    if (!this.capMesh) return;
+
+    if (!this.isCapOpen) {
+      // Unscrew & Pop Open
+      this.isCapOpen = true;
+      gsap.to(this.capMesh.position, {
+        y: 2.25,
+        x: 0.25,
+        duration: 0.75,
+        ease: 'back.out(1.5)'
+      });
+      gsap.to(this.capMesh.rotation, {
+        y: this.capMesh.rotation.y + Math.PI * 5,
+        z: 0.22,
+        duration: 0.75,
+        ease: 'power2.out'
+      });
+
+      this.triggerMistPuff();
+      if (audio) audio.playPop();
+
+      // Show temporary uncap toast on screen
+      this.showUncapHint('BOTTLE OPENED • FRESH CITRUS MIST RELEASED');
+    } else {
+      // Screw Back Shut
+      this.isCapOpen = false;
+      gsap.to(this.capMesh.position, {
+        y: 1.62,
+        x: 0,
+        duration: 0.65,
+        ease: 'power3.inOut'
+      });
+      gsap.to(this.capMesh.rotation, {
+        y: this.capMesh.rotation.y - Math.PI * 5,
+        z: 0,
+        duration: 0.65,
+        ease: 'power3.inOut'
+      });
+
+      if (audio) audio.playCapClick();
+      this.showUncapHint('BOTTLE SEALED FRESH');
+    }
+  }
+
+  showUncapHint(msg) {
+    const hint = document.getElementById('uncap-toast');
+    if (hint) {
+      hint.textContent = msg;
+      hint.classList.add('visible');
+      clearTimeout(this.toastTimeout);
+      this.toastTimeout = setTimeout(() => hint.classList.remove('visible'), 2400);
+    }
+  }
+
+  // =========================================================================
   // 3D RAYCASTER & INTERACTIVE HOVER
   // =========================================================================
   setupRaycaster() {
@@ -430,6 +591,26 @@ export class SceneManager {
     return null;
   }
 
+  checkHeroCapRaycast(camera) {
+    if (!this.capMesh) return false;
+    this.raycaster.setFromCamera(this.mouse, camera);
+    const intersects = this.raycaster.intersectObjects([this.capMesh], true);
+    return intersects.length > 0;
+  }
+
+  checkFruitRaycast(camera) {
+    this.raycaster.setFromCamera(this.mouse, camera);
+    const intersects = this.raycaster.intersectObjects(this.fruitObjects, true);
+    if (intersects.length > 0) {
+      let obj = intersects[0].object;
+      while (obj && !obj.userData?.rotSpeed && obj.parent) {
+        obj = obj.parent;
+      }
+      return obj;
+    }
+    return null;
+  }
+
   // =========================================================================
   // MAIN ANIMATION LOOP
   // =========================================================================
@@ -440,21 +621,41 @@ export class SceneManager {
     this.bottleGroup.position.y = floatY;
     this.bottleGroup.rotation.z = floatRotZ;
 
-    // 2. Continuous Fruit Micro-Rotation
+    // 2. Real Liquid Slosh & Inertia Physics
+    const dx = this.mouse.x - this.prevMouse.x;
+    const dy = this.mouse.y - this.prevMouse.y;
+    this.prevMouse.x = this.mouse.x;
+    this.prevMouse.y = this.mouse.y;
+
+    this.slosh.targetX = THREE.MathUtils.clamp(dx * 2.2, -0.6, 0.6);
+    this.slosh.targetZ = THREE.MathUtils.clamp(dy * 2.2, -0.6, 0.6);
+
+    this.slosh.x = THREE.MathUtils.lerp(this.slosh.x, this.slosh.targetX, 0.12);
+    this.slosh.z = THREE.MathUtils.lerp(this.slosh.z, this.slosh.targetZ, 0.12);
+
+    if (this.liquidMesh) {
+      this.liquidMesh.rotation.z = this.slosh.x * 0.28;
+      this.liquidMesh.rotation.x = this.slosh.z * 0.28;
+    }
+
+    // 3. Continuous Fruit Micro-Rotation
     this.fruitObjects.forEach(f => {
       if (f.userData?.rotSpeed) {
         f.rotation.x += f.userData.rotSpeed.x;
         f.rotation.y += f.userData.rotSpeed.y;
         f.rotation.z += f.userData.rotSpeed.z;
+        // Damping any high impulse back to gentle spin
+        f.userData.rotSpeed.x = THREE.MathUtils.lerp(f.userData.rotSpeed.x, 0.008, 0.03);
+        f.userData.rotSpeed.y = THREE.MathUtils.lerp(f.userData.rotSpeed.y, 0.012, 0.03);
       }
     });
 
-    // 3. Splash subtle pulse
+    // 4. Splash subtle pulse
     if (this.splash && this.splash.scale.x > 0.05) {
       this.splash.rotation.y += 0.008;
     }
 
-    // 4. Gallery Hover check
+    // 5. Gallery Hover check
     const hovered = this.checkRaycast(camera);
     this.galleryBottles.forEach(bottle => {
       if (bottle === hovered) {
@@ -466,7 +667,12 @@ export class SceneManager {
         bottle.scale.lerp(new THREE.Vector3(1.0, 1.0, 1.0), 0.1);
       }
     });
-    if (!hovered && document.body.style.cursor === 'pointer') {
+
+    // Cap hover check
+    const isCapHovered = this.checkHeroCapRaycast(camera);
+    if (isCapHovered) {
+      document.body.style.cursor = 'pointer';
+    } else if (!hovered && document.body.style.cursor === 'pointer') {
       document.body.style.cursor = 'default';
     }
 
