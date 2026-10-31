@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PULSÉ — PURE ENERGY | Premium Cold-Pressed Elixirs</title>
+  <meta name="description" content="Cinematic 3D experience of PULSÉ — raw cold-pressed fruit juices in crystalline glass bottles. Pure Energy, 0g added sugar.">
+
+  <!-- Favicon & Stylesheet -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23FF5722'/><text x='50' y='65' font-size='42' font-weight='900' text-anchor='middle' fill='white'>P</text></svg>">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- Scroll Height Spacer (Drives GSAP ScrollTrigger) -->
+  <main class="scroll-container"></main>
+
+  <!-- Loading Screen -->
+  <div id="app-loader" class="app-loader">
+    <div class="loader-logo">PULSÉ</div>
+    <div class="loader-bar-track">
+      <div class="loader-bar-fill"></div>
+    </div>
+    <div class="loader-text">PREPARING 3D COLD-PRESSED EXPERIENCE</div>
+  </div>
+
+  <!-- Dynamic Studio Background Gradient -->
+  <div id="bg-gradient"></div>
+
+  <!-- Pinned 3D WebGL Canvas Container -->
+  <div id="webgl-canvas-container"></div>
+
+  <!-- Pinned Navigation Header -->
+  <nav class="site-nav">
+    <a href="#" class="brand-logo">
+      <span class="brand-name">PULSÉ</span>
+      <span class="brand-sub">PURE ENERGY</span>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="#flavours" id="nav-flavours">Flavours</a></li>
+      <li><a href="#ingredients" id="nav-ingredients">Our Ingredients</a></li>
+      <li><a href="#story" id="nav-story">Our Story</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <!-- Web Audio Synthesizer Sound Button -->
+      <button class="sound-btn" id="sound-toggle-btn" aria-label="Toggle Sound">
+        <span class="sound-icon-bars">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </span>
+        <span class="sound-label">SOUND OFF</span>
+      </button>
+
+      <button class="btn-primary" id="nav-explore-btn">EXPLORE</button>
+    </div>
+  </nav>
+
+  <!-- Pinned Screen Overlay for Story Blocks -->
+  <div class="scene-overlay">
+    <div class="story-stage">
+
+      <!-- HERO SECTION: THE FIRST IMPRESSION -->
+      <div class="text-block hero-text-block">
+        <span class="text-label">COLLECTION 2026 // HARVEST NO. 01</span>
+        <h1 class="text-title">REAL FRUIT.<br>PURE ENERGY.</h1>
+        <p class="text-sub">Freshness, reimagined in every drop. 100% raw cold-pressed botanicals crafted in crystalline glass.</p>
+        <button class="btn-primary" id="hero-cta-btn">DISCOVER THE FLAVOUR</button>
+      </div>
+
+      <!-- SCENE 01: THE BOTTLE REVEAL -->
+      <div class="text-block scene-1-text">
+        <span class="text-label">SCENE 01 // ARCHITECTURE OF GLASS</span>
+        <h2 class="text-title">PRECISION IN<br>EVERY CURVE.</h2>
+        <p class="text-sub">Hand-blown flint glass meets knurled satin aluminium. Engineered to protect natural organic enzymes from ultraviolet degradation.</p>
+      </div>
+
+      <!-- SCENE 02: REAL FRUIT EXPLOSION -->
+      <div class="text-block scene-2-text">
+        <span class="text-label">SCENE 02 // SENSORY DETONATION</span>
+        <h2 class="text-title">NOT JUST JUICE.<br>A BURST OF NATURE.</h2>
+        <p class="text-sub">Slow-motion cold extraction locks in active phytonutrients, natural vitamins, and vibrant sun-drenched oils.</p>
+        <div class="stats-row">
+          <div class="stat-item">
+            <span class="stat-value">100%</span>
+            <span class="stat-name">Cold-Pressed</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">0g</span>
+            <span class="stat-name">Added Sugar</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">220%</span>
+            <span class="stat-name">Vitamin C</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCENE 03: THE JUICE SPLASH -->
+      <div class="text-block scene-3-text">
+        <span class="text-label">SCENE 03 // LIQUID SCULPTURE</span>
+        <h2 class="text-title">FRESHNESS.<br>IN EVERY DROP.</h2>
+        <p class="text-sub">Unfiltered living nectar suspended in pure fluid motion. Raw botanical hydration that electrifies your palate.</p>
+      </div>
+
+      <!-- SCENE 04: THE BOTTLE MACRO SHOT -->
+      <div class="text-block scene-4-text">
+        <span class="text-label">SCENE 04 // MACRO BOTANICAL CRAFT</span>
+        <h2 class="text-title">PURE INGREDIENTS.<br>NOTHING UNNECESSARY.</h2>
+        <p class="text-sub">Condensation beads form at 3°C cellaring temperature. No concentrates, no stabilizers, no artificial preservatives ever.</p>
+      </div>
+
+      <!-- SCENE 05: THE FLAVOUR TRANSFORMATION -->
+      <div class="text-block scene-5-text">
+        <span class="text-label">SCENE 05 // FIVE SIGNATURE BLENDS</span>
+        <h2 class="text-title">AN ORCHESTRA<br>OF TERROIRS.</h2>
+        <p class="text-sub">From the volcanic slopes of Mount Etna to Nordic boreal forests. Scroll or tap below to witness the flavor morph.</p>
+      </div>
+
+      <!-- SCENE 06: THE INGREDIENT WORLD -->
+      <div class="text-block scene-6-text">
+        <span class="text-label">SCENE 06 // BOTANICAL PROVENANCE</span>
+        <h2 class="text-title">REAL FRUIT.<br>REAL FLAVOUR.</h2>
+        <p class="text-sub">Sourced exclusively from certified heritage orchards and regenerative family cooperatives worldwide.</p>
+      </div>
+
+      <!-- SCENE 07: THE FLOATING 3D PRODUCT GALLERY -->
+      <div class="text-block scene-7-text">
+        <span class="text-label">SCENE 07 // COMPLETE HARVEST</span>
+        <h2 class="text-title">THE PULSÉ<br>COLLECTION.</h2>
+        <p class="text-sub">Hover or tap any 3D bottle in the lineup to inspect tasting notes, origin terroir, and complete nutrition.</p>
+      </div>
+
+      <!-- SCENE 08: FINAL HERO AND CALL TO ACTION -->
+      <div class="text-block scene-8-text">
+        <span class="text-label">SCENE 08 // TASTE THE PURE ENERGY</span>
+        <h2 class="text-title">MAKE EVERY<br>SIP COUNT.</h2>
+        <p class="text-sub">Discover your next favourite flavour. Delivered cold to your door in eco-insulated thermal glass crates.</p>
+        <button class="btn-primary" id="final-cta-btn">ORDER TASTING PACK</button>
+      </div>
+
+    </div>
+
+    <!-- Scroll Indicator in Hero Section -->
+    <div class="scroll-indicator-hero">
+      <div class="scroll-indicator-mouse"></div>
+      <span>SCROLL TO EXPERIENCE</span>
+    </div>
+  </div>
+
+  <!-- Bottom Interactive HUD Dock -->
+  <footer class="site-hud">
+    <div class="hud-step" id="hud-step">01 / 08 • THE FIRST IMPRESSION</div>
+
+    <!-- Real-time Flavour Quick-Selector -->
+    <div class="flavor-selector-dock" role="tablist">
+      <button class="flavor-pill active" data-flavor="0" role="tab" aria-selected="true">
+        <span class="flavor-dot dot-blood-orange"></span>
+        <span>BLOOD ORANGE</span>
+      </button>
+      <button class="flavor-pill" data-flavor="1" role="tab" aria-selected="false">
+        <span class="flavor-dot dot-mango"></span>
+        <span>MANGO</span>
+      </button>
+      <button class="flavor-pill" data-flavor="2" role="tab" aria-selected="false">
+        <span class="flavor-dot dot-blueberry"></span>
+        <span>BLUEBERRY</span>
+      </button>
+      <button class="flavor-pill" data-flavor="3" role="tab" aria-selected="false">
+        <span class="flavor-dot dot-kiwi"></span>
+        <span>KIWI</span>
+      </button>
+      <button class="flavor-pill" data-flavor="4" role="tab" aria-selected="false">
+        <span class="flavor-dot dot-strawberry"></span>
+        <span>STRAWBERRY</span>
+      </button>
+    </div>
+
+    <!-- Scroll Progress Indicator Track -->
+    <div class="scroll-progress-track">
+      <div id="scroll-progress-fill"></div>
+    </div>
+  </footer>
+
+  <!-- Product Tasting Drawer / Modal -->
+  <aside class="product-drawer" id="product-drawer" aria-hidden="true">
+    <div class="drawer-header">
+      <span class="brand-sub">TASTING VAULT</span>
+      <button class="drawer-close-btn" id="drawer-close" aria-label="Close Drawer">&times;</button>
+    </div>
+
+    <div class="drawer-flavor-tabs">
+      <button class="drawer-flavor-tab active">BLOOD ORANGE</button>
+      <button class="drawer-flavor-tab">ALPHONSO MANGO</button>
+      <button class="drawer-flavor-tab">WILD BLUEBERRY</button>
+      <button class="drawer-flavor-tab">GOLDEN KIWI</button>
+      <button class="drawer-flavor-tab">ALPINE STRAWBERRY</button>
+    </div>
+
+    <div class="drawer-content">
+      <span class="drawer-tagline" id="drawer-prod-tagline">VIBRANT RUBY CITRUS</span>
+      <h3 class="drawer-title" id="drawer-prod-name">BLOOD ORANGE</h3>
+      <p class="drawer-desc" id="drawer-prod-desc">Cold-pressed Sicilian Tarocco & Sanguinello oranges with a zesty, bittersweet crimson finish.</p>
+
+      <div class="drawer-origin-box">
+        <strong>TERROIR ORIGIN:</strong>
+        <p id="drawer-prod-origin">Mount Etna Volcanic Orchards, Sicily</p>
+      </div>
+
+      <div>
+        <h4 style="font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.8rem; color: #fff;">TASTING NOTES:</h4>
+        <ul class="drawer-tasting-notes" id="drawer-tasting-notes">
+          <li>• Sun-Drenched Citrus</li>
+          <li>• Ruby Grapefruit Zest</li>
+          <li>• Subtle Raspberry Undertone</li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 style="font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.8rem; color: #fff;">NUTRITIONAL PROFILE (PER 330ML):</h4>
+        <div class="nutrition-grid">
+          <div class="nutri-item">
+            <span class="nutri-label">ENERGY</span>
+            <span class="nutri-val" id="drawer-val-energy">398 kJ / 95 kcal</span>
+          </div>
+          <div class="nutri-item">
+            <span class="nutri-label">NATURAL SUGAR</span>
+            <span class="nutri-val" id="drawer-val-sugar">19.8g (0g Added)</span>
+          </div>
+          <div class="nutri-item">
+            <span class="nutri-label">CARBOHYDRATES</span>
+            <span class="nutri-val" id="drawer-val-carbs">22.4g</span>
+          </div>
+          <div class="nutri-item">
+            <span class="nutri-label">VITAMIN C</span>
+            <span class="nutri-val" id="drawer-val-vitc">220% DV</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-primary drawer-action-btn" id="drawer-order-action">ORDER TASTING CRATE • $38.00</button>
+    </div>
+  </aside>
+
+  <!-- Luxury Editorial Footer (Revealed at Scroll End) -->
+  <footer class="luxury-footer">
+    <div class="footer-top">
+      <div class="footer-col" style="max-width: 320px;">
+        <span class="brand-name" style="font-size: 1.4rem;">PULSÉ</span>
+        <span class="brand-sub">PURE ENERGY</span>
+        <p style="font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-top: 0.5rem; line-height: 1.5;">
+          Dedicated to uncompromised botanical vitality. 100% cold-pressed, never heated, sustainably bottled in infinitely recyclable flint glass.
+        </p>
+      </div>
+
+      <div class="footer-col">
+        <span class="footer-title">COLLECTION</span>
+        <a href="#blood-orange">Blood Orange Tarocco</a>
+        <a href="#mango">Alphonso Mango Nectar</a>
+        <a href="#blueberry">Arctic Wild Bilberry</a>
+        <a href="#kiwi">Golden SunGold Kiwi</a>
+        <a href="#strawberry">Alpine Wild Strawberry</a>
+      </div>
+
+      <div class="footer-col">
+        <span class="footer-title">SUSTAINABILITY</span>
+        <a href="#">Zero Waste Pressing</a>
+        <a href="#">Volcanic Soil Regenerative Project</a>
+        <a href="#">Closed-Loop Glass Cellar</a>
+        <a href="#">Certified B-Corp Pending</a>
+      </div>
+
+      <div class="footer-col">
+        <span class="footer-title">CONNECT</span>
+        <a href="#">Instagram @pulse.pure</a>
+        <a href="#">Stockists & Michelin Partners</a>
+        <a href="#">Concierge Inquiries</a>
+        <a href="#">Press Kit 2026</a>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© 2026 PULSÉ BOTANICAL BEVERAGES LTD. ALL RIGHTS RESERVED.</span>
+      <span>CRAFTED WITH THREE.JS & GSAP SCROLLTRIGGER</span>
+    </div>
+  </footer>
+
+  <!-- Application Module Entrypoint -->
+  <script type="module" src="/js/main.js"></script>
+</body>
+</html>
